@@ -60,6 +60,7 @@ Explore::Explore()
 {
   double timeout;
   double min_frontier_size;
+  bool auto_start;
   private_nh_.param("planner_frequency", planner_frequency_, 1.0);
   private_nh_.param("progress_timeout", timeout, 30.0);
   progress_timeout_ = ros::Duration(timeout);
@@ -68,6 +69,10 @@ Explore::Explore()
   private_nh_.param("orientation_scale", orientation_scale_, 0.0);
   private_nh_.param("gain_scale", gain_scale_, 1.0);
   private_nh_.param("min_frontier_size", min_frontier_size, 0.5);
+  private_nh_.param("auto_start", auto_start, true);
+
+  explore_service_ = private_nh_.advertiseService(
+      "explore_service", &Explore::explore_service, this);
 
   search_ = frontier_exploration::FrontierSearch(costmap_client_.getCostmap(),
                                                  potential_scale_, gain_scale_,
@@ -82,9 +87,9 @@ Explore::Explore()
   move_base_client_.waitForServer();
   ROS_INFO("Connected to move_base server");
 
-  exploring_timer_ =
-      relative_nh_.createTimer(ros::Duration(1. / planner_frequency_),
-                               [this](const ros::TimerEvent&) { makePlan(); });
+  exploring_timer_ = relative_nh_.createTimer(
+      ros::Duration(1. / planner_frequency_),
+      [this](const ros::TimerEvent&) { makePlan(); }, false, auto_start);
 }
 
 Explore::~Explore()
@@ -290,6 +295,21 @@ void Explore::stop()
   move_base_client_.cancelAllGoals();
   exploring_timer_.stop();
   ROS_INFO("Exploration stopped.");
+}
+
+bool Explore::explore_service(std_srvs::SetBool::Request& req,
+                              std_srvs::SetBool::Response& res)
+{
+  if (req.data) {
+    this->start();
+    res.success = true;
+    res.message = "Starting Exploration";
+  } else {
+    this->stop();
+    res.success = true;
+    res.message = "Stopping Exploration";
+  }
+  return true;
 }
 
 }  // namespace explore

@@ -1,4 +1,5 @@
 <launch>
+<arg name="auto_start" default="false"/>
 <node pkg="explore_lite" type="explore" respawn="false" name="explore" output="screen">
   <param name="robot_base_frame" value="base_link"/>
   <param name="costmap_topic" value="map"/>
@@ -11,5 +12,6 @@
   <param name="gain_scale" value="1.0"/>
   <param name="transform_tolerance" value="0.3"/>
   <param name="min_frontier_size" value="0.75"/>
+  <param name="auto_start" value="$(arg auto_start)"/>
 </node>
 </launch>

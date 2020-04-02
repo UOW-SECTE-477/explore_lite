@@ -37,19 +37,19 @@
 #ifndef NAV_EXPLORE_H_
 #define NAV_EXPLORE_H_
 
+#include <actionlib/client/simple_action_client.h>
+#include <explore/costmap_client.h>
+#include <explore/frontier_search.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <move_base_msgs/MoveBaseAction.h>
+#include <ros/ros.h>
+#include <std_srvs/SetBool.h>
+#include <visualization_msgs/MarkerArray.h>
+
 #include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
-
-#include <actionlib/client/simple_action_client.h>
-#include <geometry_msgs/PoseStamped.h>
-#include <move_base_msgs/MoveBaseAction.h>
-#include <ros/ros.h>
-#include <visualization_msgs/MarkerArray.h>
-
-#include <explore/costmap_client.h>
-#include <explore/frontier_search.h>
 
 namespace explore
 {
@@ -66,6 +66,9 @@ public:
 
   void start();
   void stop();
+
+  bool explore_service(std_srvs::SetBool::Request& req,
+                       std_srvs::SetBool::Response& res);
 
 private:
   /**
@@ -88,6 +91,7 @@ private:
   ros::NodeHandle private_nh_;
   ros::NodeHandle relative_nh_;
   ros::Publisher marker_array_publisher_;
+  ros::ServiceServer explore_service_;
   tf::TransformListener tf_listener_;
 
   Costmap2DClient costmap_client_;
@@ -109,6 +113,6 @@ private:
   ros::Duration progress_timeout_;
   bool visualize_;
 };
-}
+}  // namespace explore
 
 #endif
