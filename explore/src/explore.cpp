@@ -192,6 +192,13 @@ void Explore::makePlan()
     ROS_DEBUG("frontier %zd cost: %f", i, frontiers[i].cost);
   }
 
+  frontiers.erase(
+      std::remove_if(frontiers.begin(), frontiers.end(),
+                     [this](const frontier_exploration::Frontier& f) {
+                       return goalOnBlacklist(f.centroid);
+                     }),
+      frontiers.end());
+
   // publish frontiers as visualization markers
   if (visualize_) {
     visualizeFrontiers(frontiers);
