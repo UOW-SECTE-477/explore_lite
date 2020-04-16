@@ -192,14 +192,14 @@ void Explore::makePlan()
     ROS_DEBUG("frontier %zd cost: %f", i, frontiers[i].cost);
   }
 
-  if (frontiers.empty()) {
-    stop();
-    return;
-  }
-
   // publish frontiers as visualization markers
   if (visualize_) {
     visualizeFrontiers(frontiers);
+  }
+
+  if (frontiers.empty()) {
+    stop();
+    return;
   }
 
   // find non blacklisted frontier
